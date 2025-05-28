@@ -1,23 +1,19 @@
-// cypress/e2e/realbeans-store.cy.js
 
 describe('RealBeans Shopify Store Tests', () => {
   const storeUrl = 'https://r0987077-realbeans.myshopify.com';
   const storePassword = 'loowep';
 
   beforeEach(() => {
-    // Handle password protection
     cy.visit(storeUrl);
     
-    // Wait for page to load and check for password form
     cy.url().then((url) => {
       if (url.includes('/password')) {
         cy.get('input[name="password"]', { timeout: 10000 }).should('be.visible');
         cy.get('input[name="password"]').type(storePassword);
         cy.get('button[type="submit"], input[type="submit"]').click();
         
-        // Wait for redirect and ensure we're no longer on password page
         cy.url({ timeout: 10000 }).should('not.include', '/password');
-        cy.wait(2000); // Increased wait time for page to fully load
+        cy.wait(2000); 
       }
     });
   });
@@ -29,7 +25,6 @@ describe('RealBeans Shopify Store Tests', () => {
     });
 
     it('should display the banner image', () => {
-      // More flexible banner image selectors
       cy.get('img[alt*="RealBeans"], img[src*="banner"], .banner img, .hero img, img[src*="RealBeans"]')
         .should('be.visible')
         .and('have.attr', 'src')
@@ -37,8 +32,7 @@ describe('RealBeans Shopify Store Tests', () => {
     });
 
     it('should show product list on homepage', () => {
-      // First check if we're on a homepage that shows products
-      // Some themes show products on homepage, others don't
+
       cy.get('body').then(($body) => {
         const productSelectors = [
           '[data-product]',
@@ -56,12 +50,12 @@ describe('RealBeans Shopify Store Tests', () => {
           if ($body.find(selector).length > 0) {
             foundProducts = true;
             cy.get(selector).should('have.length.greaterThan', 0);
-            return false; // Exit loop
+            return false; 
           }
         });
         
         if (!foundProducts) {
-          // If no products on homepage, check if there's a "Shop" or "Products" link
+      
           cy.get('a[href*="collections"], a[href*="products"]')
             .should('exist');
         }
@@ -72,9 +66,8 @@ describe('RealBeans Shopify Store Tests', () => {
   describe('Product Catalog Tests', () => {
     it('should display the product catalog page with correct items', () => {
       cy.visit(`${storeUrl}/collections/all`);
-      cy.wait(3000); // Wait for products to load
+      cy.wait(3000); 
       
-      // Try multiple common product selectors
       const productSelectors = [
         '.product-item',
         '.card-product',
@@ -99,12 +92,11 @@ describe('RealBeans Shopify Store Tests', () => {
         if (productSelector) {
           cy.get(productSelector).should('have.length.greaterThan', 0);
         } else {
-          // Fallback: look for any elements that might be products
+        
           cy.get('a[href*="/products/"]').should('have.length.greaterThan', 0);
         }
       });
       
-      // Check for product names (more flexible)
       cy.get('body').then(($body) => {
         const bodyText = $body.text();
         const hasProducts = bodyText.includes('Espresso') || 
@@ -119,7 +111,6 @@ describe('RealBeans Shopify Store Tests', () => {
       cy.visit(`${storeUrl}/collections/all`);
       cy.wait(3000);
       
-      // Find sorting dropdown with more specific targeting
       cy.get('body').then(($body) => {
         const sortSelectors = [
           'select[name*="sort_by"]',
@@ -133,7 +124,7 @@ describe('RealBeans Shopify Store Tests', () => {
         let sortSelector = null;
         for (let selector of sortSelectors) {
           const elements = $body.find(selector);
-          if (elements.length === 1) { // Make sure we only find one
+          if (elements.length === 1) { 
             sortSelector = selector;
             break;
           }
@@ -144,7 +135,6 @@ describe('RealBeans Shopify Store Tests', () => {
           cy.wait(2000);
           cy.url().should('include', 'sort_by=price-ascending');
         } else {
-          // Skip test if no sort functionality found
           cy.log('No sorting functionality found - this may be disabled in the theme');
         }
       });
@@ -156,15 +146,12 @@ describe('RealBeans Shopify Store Tests', () => {
       cy.visit(`${storeUrl}/collections/all`);
       cy.wait(3000);
       
-      // Find and click on first visible product link
       cy.get('a[href*="/products/"]:visible').first().click();
       cy.wait(2000);
       
-      // Check product details are displayed
       cy.get('h1, .product__title, .product-title, [data-product-title]').should('be.visible');
       cy.get('.price, [data-price], .product__price, .money').should('be.visible');
       
-      // Check for product images (more flexible approach)
       cy.get('.product__media img, .product-image img, img[alt*="coffee"], img[alt*="Coffee"]')
         .should('exist')
         .and('have.attr', 'src')
@@ -175,14 +162,12 @@ describe('RealBeans Shopify Store Tests', () => {
       cy.visit(`${storeUrl}/collections/all`);
       cy.wait(3000);
       
-      // Find and click on first visible product link
       cy.get('a[href*="/products/"]:visible').first().click();
       cy.wait(2000);
       
-      // Check product images exist and have alt attributes (even if empty)
       cy.get('.product__media img, .product-image img, img[alt*="coffee"], img[alt*="Coffee"]')
         .should('exist')
-        .and('have.attr', 'alt'); // Remove the empty check since some images may have empty alt text
+        .and('have.attr', 'alt'); 
     });
   });
 
@@ -191,7 +176,6 @@ describe('RealBeans Shopify Store Tests', () => {
       cy.visit(`${storeUrl}/pages/about`);
       cy.wait(2000);
       
-      // Check for About page content
       cy.contains('From a small Antwerp grocery to a European coffee staple')
         .should('be.visible');
       
@@ -206,36 +190,23 @@ describe('RealBeans Shopify Store Tests', () => {
       cy.visit(storeUrl);
       cy.wait(2000);
       
-      // Try multiple navigation selectors
-      const navSelectors = [
-        'nav a:contains("About")',
-        '.header a:contains("About")',
-        '.navigation a:contains("About")',
-        '.menu a:contains("About")',
-        'a[href*="/pages/about"]',
-        'a[href$="/about"]'
-      ];
-      
       cy.get('body').then(($body) => {
-        let foundAboutLink = false;
+        const desktopAboutLink = $body.find('nav a:visible, .header a:visible').filter(':contains("About")');
         
-        for (let selector of navSelectors) {
-          if ($body.find(selector).length > 0) {
-            cy.get(selector).first().click();
-            foundAboutLink = true;
-            break;
-          }
-        }
-        
-        if (foundAboutLink) {
-          cy.url().should('include', '/pages/about');
+        if (desktopAboutLink.length > 0) {
+          cy.contains('a:visible', 'About', { matchCase: false }).click();
         } else {
-          // Manually navigate to about page if link not found in nav
-          cy.visit(`${storeUrl}/pages/about`);
-          cy.url().should('include', '/pages/about');
-          cy.log('About link not found in navigation - navigated directly');
+          cy.get('[aria-controls*="drawer"], .header__icon--menu, button[aria-expanded]')
+            .first()
+            .click({ force: true });
+          
+          cy.wait(500);
+          
+          cy.get('a[href*="/pages/about"]').click({ force: true });
         }
       });
+      
+      cy.url().should('include', '/pages/about');
     });
   });
 
