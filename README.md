@@ -1,1 +1,2 @@
 # realbeans-cypress-tests
+test
