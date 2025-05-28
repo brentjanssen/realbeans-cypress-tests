@@ -17,10 +17,9 @@ jobs:
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
         with:
-          # Starts web server for E2E tests - replace with your own server invocation
-          # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
-          start: npm start
-          wait-on: 'http://localhost:3000' # Waits for above
+          # NO start/wait-on needed - we're testing external Shopify store
+          # start: npm start  # REMOVED - no local server needed
+          # wait-on: 'http://localhost:3000'  # REMOVED - testing external site
           # Records to Cypress Cloud 
           # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
           record: true
